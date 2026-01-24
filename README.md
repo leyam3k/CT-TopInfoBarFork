@@ -11,8 +11,8 @@ A SillyTavern/CozyTavern extension that provides accessible info and dropdown se
   - Quick access buttons for chat management (rename, new, close)
 
 - **Second Row with Dual Dropdown Selectors**:
-  - **OpenAI Presets Selector**: Quick switch between Chat Completion presets
   - **Connection Profiles Selector**: Fast switching between connection profiles
+  - **OpenAI Presets Selector**: Quick switch between Chat Completion presets
   - Both selectors are synced with their native SillyTavern counterparts
 
 - **Sidebar Panel**: A draggable panel showing all chats for the current character/group with:

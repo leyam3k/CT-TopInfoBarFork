@@ -325,7 +325,7 @@ function addConnectionProfiles() {
     openaiPresetsSelect.title = t`Switch OpenAI preset`;
 
     connectionProfiles.classList.add('visible'); // Make it permanently visible
-    connectionProfiles.append(openaiPresetsSelect, connectionProfilesSelect);
+    connectionProfiles.append(connectionProfilesSelect, openaiPresetsSelect);
     sheld.insertBefore(connectionProfiles, chat);
 }
 
