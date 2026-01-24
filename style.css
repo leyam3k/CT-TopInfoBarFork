@@ -7,7 +7,6 @@ body #sheld.flexPatch #chat {
     flex-grow: 1;
 }
 
-#extensionTopBarToggleConnectionProfiles.active,
 #extensionTopBarToggleSidebar.active {
     filter: brightness(150%);
 }
@@ -161,37 +160,15 @@ body.movingUI #extensionTopBar {
     padding-right: 30px;
 }
 
-#extensionConnectionProfilesStatus {
-    flex: 1;
-    opacity: 0.8;
-    text-align: right;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    font-size: calc(var(--mainFontSize)* 0.85);
-}
-
-#extensionConnectionProfilesStatus~.null-icon {
-    visibility: hidden;
-}
-
-#extensionConnectionProfilesIcon,
-#extensionConnectionProfilesStatus~.icon-svg {
-    opacity: 0.8;
-}
-
-#extensionConnectionProfilesStatus.offline {
-    font-style: italic;
-    opacity: 0.5;
-}
-
+#extensionOpenaiPresetsSelect,
 #extensionConnectionProfilesSelect {
     flex: 1;
     cursor: pointer;
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 100%;
+    width: 50%;
+    min-width: 0;
     opacity: 0.8;
     background: none;
     border: none;

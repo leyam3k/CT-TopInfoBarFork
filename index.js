@@ -11,7 +11,7 @@ const {
 } = SillyTavern.getContext();
 import { addJQueryHighlight } from './jquery-highlight.js';
 import { getGroupPastChats } from '../../../group-chats.js';
-import { getPastCharacterChats, animation_duration, animation_easing, getGeneratingApi } from '../../../../script.js';
+import { getPastCharacterChats, animation_duration, animation_easing } from '../../../../script.js';
 import { debounce, timestampToMoment, sortMoments, uuidv4, waitUntilCondition } from '../../../utils.js';
 import { debounce_timeout } from '../../../constants.js';
 import { t } from '../../../i18n.js';
@@ -20,15 +20,13 @@ const movingDivs = /** @type {HTMLDivElement} */ (document.getElementById('movin
 const sheld = /** @type {HTMLDivElement} */ (document.getElementById('sheld'));
 const chat = /** @type {HTMLDivElement} */ (document.getElementById('chat'));
 const draggableTemplate = /** @type {HTMLTemplateElement} */ (document.getElementById('generic_draggable_template'));
-const apiBlock = /** @type {HTMLDivElement} */ (document.getElementById('rm_api_block'));
 
 const topBar = document.createElement('div');
 const chatName = document.createElement('select');
 const searchInput = document.createElement('input');
 const connectionProfiles = document.createElement('div');
-const connectionProfilesStatus = document.createElement('div');
 const connectionProfilesSelect = document.createElement('select');
-const connectionProfilesIcon = document.createElement('img');
+const openaiPresetsSelect = document.createElement('select');
 
 const icons = [
     {
@@ -37,14 +35,6 @@ const icons = [
         position: 'left',
         title: t`Toggle sidebar`,
         onClick: onToggleSidebarClick,
-    },
-    {
-        id: 'extensionTopBarToggleConnectionProfiles',
-        icon: 'fa-fw fa-solid fa-plug',
-        position: 'left',
-        title: t`Show connection profiles`,
-        isTemporaryAllowed: true,
-        onClick: onToggleConnectionProfilesClick,
     },
     {
         id: 'extensionTopBarChatManager',
@@ -329,20 +319,14 @@ function addSideBar() {
 
 function addConnectionProfiles() {
     connectionProfiles.id = 'extensionConnectionProfiles';
-    connectionProfilesStatus.id = 'extensionConnectionProfilesStatus';
     connectionProfilesSelect.id = 'extensionConnectionProfilesSelect';
     connectionProfilesSelect.title = t`Switch connection profile`;
+    openaiPresetsSelect.id = 'extensionOpenaiPresetsSelect';
+    openaiPresetsSelect.title = t`Switch OpenAI preset`;
 
-    const connectionProfilesServerIcon = document.createElement('i');
-    connectionProfilesServerIcon.id = 'extensionConnectionProfilesIcon';
-    connectionProfilesServerIcon.className = 'fa-fw fa-solid fa-network-wired';
-
-    connectionProfiles.append(connectionProfilesServerIcon, connectionProfilesSelect, connectionProfilesStatus, connectionProfilesIcon);
+    connectionProfiles.classList.add('visible'); // Make it permanently visible
+    connectionProfiles.append(openaiPresetsSelect, connectionProfilesSelect);
     sheld.insertBefore(connectionProfiles, chat);
-
-    apiBlock.querySelectorAll('select').forEach(select => {
-        select.addEventListener('input', () => updateStatusDebounced());
-    });
 }
 
 function bindConnectionProfilesSelect() {
@@ -363,6 +347,30 @@ function bindConnectionProfilesSelect() {
             connectionProfilesSelect.value = connectionProfilesMainSelect.value;
         });
         observer.observe(connectionProfilesMainSelect, { childList: true });
+    });
+
+    // Bind OpenAI presets select
+    waitUntilCondition(() => document.getElementById('settings_preset_openai') !== null).then(() => {
+        const openaiPresetsMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('settings_preset_openai'));
+        if (!openaiPresetsMainSelect) {
+            return;
+        }
+        // Initial sync
+        openaiPresetsSelect.innerHTML = openaiPresetsMainSelect.innerHTML;
+        openaiPresetsSelect.value = openaiPresetsMainSelect.value;
+
+        openaiPresetsSelect.addEventListener('change', async () => {
+            openaiPresetsMainSelect.value = openaiPresetsSelect.value;
+            openaiPresetsMainSelect.dispatchEvent(new Event('change'));
+        });
+        openaiPresetsMainSelect.addEventListener('change', async () => {
+            openaiPresetsSelect.value = openaiPresetsMainSelect.value;
+        });
+        const observer = new MutationObserver(() => {
+            openaiPresetsSelect.innerHTML = openaiPresetsMainSelect.innerHTML;
+            openaiPresetsSelect.value = openaiPresetsMainSelect.value;
+        });
+        observer.observe(openaiPresetsMainSelect, { childList: true });
     });
 }
 
@@ -534,25 +542,7 @@ async function onChatNameChange() {
     await openChatById(chatId);
 }
 
-async function onToggleConnectionProfilesClick() {
-    const button = document.getElementById('extensionTopBarToggleConnectionProfiles');
-
-    if (!button) {
-        console.warn('Connection profiles button not found');
-        return;
-    }
-
-    button.classList.toggle('active');
-    connectionProfiles.classList.toggle('visible');
-    savePanelsState();
-    await onOnlineStatusChange();
-}
-
 async function onOnlineStatusChange() {
-    if (!connectionProfiles.classList.contains('visible')) {
-        return;
-    }
-
     const connectionProfilesMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('connection_profiles'));
     if (connectionProfilesMainSelect) {
         connectionProfilesSelect.innerHTML = connectionProfilesMainSelect.innerHTML;
@@ -561,89 +551,18 @@ async function onOnlineStatusChange() {
         connectionProfilesSelect.classList.add('displayNone');
     }
 
-    if (connectionProfilesStatus.nextElementSibling?.classList?.contains('icon-svg')) {
-        connectionProfilesStatus.nextElementSibling.remove();
+    const openaiPresetsMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('settings_preset_openai'));
+    if (openaiPresetsMainSelect) {
+        openaiPresetsSelect.innerHTML = openaiPresetsMainSelect.innerHTML;
+        openaiPresetsSelect.value = openaiPresetsMainSelect.value;
+    } else {
+        openaiPresetsSelect.classList.add('displayNone');
     }
-
-    const { SlashCommandParser, onlineStatus, mainApi } = SillyTavern.getContext();
-
-    if (onlineStatus === 'no_connection') {
-        connectionProfilesStatus.classList.add('offline');
-        connectionProfilesStatus.textContent = t`No connection...`;
-
-        const nullIcon = new Image();
-        nullIcon.classList.add('icon-svg', 'null-icon');
-        connectionProfilesStatus.insertAdjacentElement('afterend', nullIcon);
-        return;
-    }
-
-    async function getCurrentAPI() {
-        let currentAPI = mainApi;
-        try {
-            const commandResult = await SlashCommandParser.commands['api'].callback({ quiet: 'true' }, '');
-            if (commandResult) {
-                currentAPI = commandResult;
-            }
-        } catch (error) {
-            console.error(t`Failed to get current API`, error);
-        }
-        const fancyNameOption = apiBlock.querySelector(`select:not(#main_api) option[value="${currentAPI}"]`) ?? apiBlock.querySelector(`select#main_api option[value="${currentAPI}"]`);
-        if (fancyNameOption) {
-            // Remove text in parentheses or brackets
-            return fancyNameOption.textContent.replace(/[[(].*[\])]/, '').trim();
-        }
-        return currentAPI;
-    }
-
-    async function getCurrentModel() {
-        let currentModel = onlineStatus;
-        try {
-            const commandResult = await SlashCommandParser.commands['model'].callback({ quiet: 'true' }, '');
-            if (commandResult && typeof commandResult === 'string') {
-                currentModel = commandResult;
-            }
-        } catch (error) {
-            console.error(t`Failed to get current model`, error);
-        }
-        const fancyNameOption = apiBlock.querySelector(`option[value="${currentModel}"]`);
-        if (fancyNameOption) {
-            return fancyNameOption.textContent.trim();
-        }
-        return currentModel;
-    }
-
-    const [currentAPI, currentModel] = await Promise.all([getCurrentAPI(), getCurrentModel()]);
-    await addConnectionProfileIcon();
-    connectionProfilesStatus.classList.remove('offline');
-    connectionProfilesStatus.textContent = `${currentAPI} – ${currentModel}`;
-}
-
-async function addConnectionProfileIcon() {
-    return new Promise((resolve) => {
-        const modelName = getGeneratingApi();
-        const image = new Image();
-        image.classList.add('icon-svg');
-        image.src = `/img/${modelName}.svg`;
-
-        image.onload = async function () {
-            connectionProfilesStatus.insertAdjacentElement('afterend', image);
-            await SVGInject(image);
-            resolve();
-        };
-
-        image.onerror = function () {
-            resolve();
-        };
-
-        // Prevent infinite waiting
-        setTimeout(() => resolve(), 500);
-    });
 }
 
 function savePanelsState() {
     localStorage.setItem('topBarPanelsState', JSON.stringify({
         sidebarVisible: document.getElementById('extensionSideBar')?.classList.contains('visible'),
-        connectionProfilesVisible: document.getElementById('extensionConnectionProfiles')?.classList.contains('visible'),
     }));
 }
 
@@ -656,10 +575,6 @@ function restorePanelsState() {
 
     if (state.sidebarVisible) {
         document.getElementById('extensionTopBarToggleSidebar')?.click();
-    }
-
-    if (state.connectionProfilesVisible) {
-        document.getElementById('extensionTopBarToggleConnectionProfiles')?.click();
     }
 }
 
