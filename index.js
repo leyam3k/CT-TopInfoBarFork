@@ -3,13 +3,10 @@ const {
     event_types,
     getCurrentChatId,
     renameChat,
-    getRequestHeaders,
     openGroupChat,
     openCharacterChat,
-    executeSlashCommandsWithOptions,
     Popup,
 } = SillyTavern.getContext();
-import { addJQueryHighlight } from './jquery-highlight.js';
 import { getGroupPastChats } from '../../../group-chats.js';
 import { getPastCharacterChats, animation_duration, animation_easing } from '../../../../script.js';
 import { debounce, timestampToMoment, sortMoments, uuidv4, waitUntilCondition } from '../../../utils.js';
@@ -22,36 +19,12 @@ const chat = /** @type {HTMLDivElement} */ (document.getElementById('chat'));
 const draggableTemplate = /** @type {HTMLTemplateElement} */ (document.getElementById('generic_draggable_template'));
 
 const topBar = document.createElement('div');
-const chatName = document.createElement('select');
-const searchInput = document.createElement('input');
+const chatName = document.createElement('div');
 const connectionProfiles = document.createElement('div');
 const connectionProfilesSelect = document.createElement('select');
 const openaiPresetsSelect = document.createElement('select');
 
 const icons = [
-    {
-        id: 'extensionTopBarToggleSidebar',
-        icon: 'fa-fw fa-solid fa-box-archive',
-        position: 'left',
-        title: t`Toggle sidebar`,
-        onClick: onToggleSidebarClick,
-    },
-    {
-        id: 'extensionTopBarChatManager',
-        icon: 'fa-fw fa-solid fa-address-book',
-        position: 'right',
-        title: t`View chat files`,
-        isTemporaryAllowed: true,
-        onClick: onChatManagerClick,
-    },
-    {
-        id: 'extensionTopBarNewChat',
-        icon: 'fa-fw fa-solid fa-comments',
-        position: 'right',
-        title: t`New chat`,
-        isTemporaryAllowed: true,
-        onClick: onNewChatClick,
-    },
     {
         id: 'extensionTopBarRenameChat',
         icon: 'fa-fw fa-solid fa-edit',
@@ -60,16 +33,12 @@ const icons = [
         onClick: onRenameChatClick,
     },
     {
-        id: 'extensionTopBarDeleteChat',
-        icon: 'fa-fw fa-solid fa-trash',
+        id: 'extensionTopBarNewChat',
+        icon: 'fa-fw fa-solid fa-comments',
         position: 'right',
-        title: t`Delete chat`,
-        onClick: async () => {
-            const confirm = await Popup.show.confirm(t`Are you sure?`);
-            if (confirm) {
-                await executeSlashCommandsWithOptions('/delchat');
-            }
-        },
+        title: t`New chat`,
+        isTemporaryAllowed: true,
+        onClick: onNewChatClick,
     },
     {
         id: 'extensionTopBarCloseChat',
@@ -126,12 +95,8 @@ function patchSheldIfNeeded() {
 
 function setChatName(name) {
     const isNotInChat = !name;
-    chatName.innerHTML = '';
-    const selectedOption = document.createElement('option');
-    selectedOption.innerText = name || t`No chat selected`;
-    selectedOption.selected = true;
-    chatName.appendChild(selectedOption);
-    chatName.disabled = true;
+    chatName.textContent = name || t`No chat selected`;
+    chatName.classList.toggle('not-in-chat', isNotInChat);
 
     icons.forEach(icon => {
         const iconElement = document.getElementById(icon.id);
@@ -140,65 +105,14 @@ function setChatName(name) {
         }
     });
 
-    if (!isNotInChat && typeof openGroupChat === 'function' && typeof openCharacterChat === 'function') {
+    if (!isNotInChat) {
         setTimeout(async () => {
-            const list = [];
-            const context = SillyTavern.getContext();
-            if (context.groupId) {
-                const group = context.groups.find(x => x.id == context.groupId);
-                if (group) {
-                    list.push(...group.chats);
-                }
-            }
-            else {
-                const characterAvatar = context.characters[context.characterId]?.avatar;
-                list.push(...await getListOfCharacterChats(characterAvatar));
-            }
-
-            if (list.length > 0) {
-                chatName.innerHTML = '';
-                list.sort((a, b) => a.localeCompare(b)).forEach((x) => {
-                    const option = document.createElement('option');
-                    option.innerText = x;
-                    option.value = x;
-                    option.selected = x === name;
-
-                    chatName.appendChild(option);
-                });
-                chatName.disabled = false;
-            }
-
             await populateSideBar();
         }, 0);
     }
 
     if (isNotInChat) {
         setTimeout(() => populateSideBar(), 0);
-    }
-}
-
-/**
- * Get list of chat names for a character.
- * @param {string} avatar Avatar name of the character
- * @returns {Promise<string[]>} List of chat names
- */
-async function getListOfCharacterChats(avatar) {
-    try {
-        const result = await fetch('/api/characters/chats', {
-            method: 'POST',
-            headers: getRequestHeaders(),
-            body: JSON.stringify({ avatar_url: avatar, simple: true }),
-        });
-
-        if (!result.ok) {
-            return [];
-        }
-
-        const data = await result.json();
-        return data.map(x => String(x.file_name).replace('.jsonl', ''));
-    } catch (error) {
-        console.error('Failed to get list of character chats', error);
-        return [];
     }
 }
 
@@ -221,34 +135,13 @@ async function getChatFiles() {
     return [];
 }
 
-/**
- * Highlight search query in chat messages
- * @param {string} query Search query
- * @returns {void}
- */
-function searchInChat(query) {
-    const options = { element: 'mark', className: 'highlight' };
-    const messages = jQuery(chat).find('.mes_text');
-    messages.unhighlight(options);
-    if (!query) {
-        return;
-    }
-    const splitQuery = query.split(/\s|\b/);
-    messages.highlight(splitQuery, options);
-}
-
-const searchDebounced = debounce((x) => searchInChat(x), 500);
 const updateStatusDebounced = debounce(onOnlineStatusChange, 1000);
 
 function addTopBar() {
     chatName.id = 'extensionTopBarChatName';
+    chatName.title = t`Click to view chat files`;
     topBar.id = 'extensionTopBar';
-    searchInput.id = 'extensionTopBarSearchInput';
-    searchInput.placeholder = 'Search...';
-    searchInput.classList.add('text_pole');
-    searchInput.type = 'search';
-    searchInput.addEventListener('input', () => searchDebounced(searchInput.value.trim()));
-    topBar.append(chatName, searchInput);
+    topBar.append(chatName);
     sheld.insertBefore(topBar, chat);
 }
 
@@ -274,10 +167,6 @@ function addIcons() {
             topBar.appendChild(iconElement);
             return;
         }
-        if (icon.position === 'middle') {
-            topBar.insertBefore(iconElement, searchInput);
-            return;
-        }
         if (icon.id === 'extensionTopBarRenameChat' && typeof renameChat !== 'function') {
             iconElement.classList.add('displayNone');
         }
@@ -300,7 +189,7 @@ function addSideBar() {
     }
 
     draggable.id = 'extensionSideBar';
-    closeButton.addEventListener('click', onToggleSidebarClick);
+    closeButton.addEventListener('click', closeSidebar);
 
     const scrollContainer = document.createElement('div');
     scrollContainer.id = 'extensionSideBarContainer';
@@ -374,21 +263,21 @@ function bindConnectionProfilesSelect() {
     });
 }
 
-async function onToggleSidebarClick() {
+async function closeSidebar() {
     const sidebar = document.getElementById('extensionSideBar');
-    const toggle = document.getElementById('extensionTopBarToggleSidebar');
 
-    if (!sidebar || !toggle) {
-        console.warn(t`Sidebar or toggle button not found`);
+    if (!sidebar) {
         return;
     }
 
-    toggle.classList.toggle('active');
     const alreadyVisible = sidebar.classList.contains('visible');
+    if (!alreadyVisible) {
+        return;
+    }
 
     const keyframes = [
-        { opacity: alreadyVisible ? 1 : 0 },
-        { opacity: alreadyVisible ? 0 : 1 },
+        { opacity: 1 },
+        { opacity: 0 },
     ];
     const options = {
         duration: animation_duration,
@@ -396,18 +285,12 @@ async function onToggleSidebarClick() {
     };
 
     const animation = sidebar.animate(keyframes, options);
-
-    if (alreadyVisible) {
-        await animation.finished;
-        sidebar.classList.toggle('visible');
-        await populateSideBar();
-    } else {
-        sidebar.classList.toggle('visible');
-        await populateSideBar();
-        await animation.finished;
+    await animation.finished;
+    sidebar.classList.remove('visible');
+    const container = document.getElementById('extensionSideBarContainer');
+    if (container) {
+        container.innerHTML = '';
     }
-
-    savePanelsState();
 }
 
 async function populateSideBar() {
@@ -537,11 +420,6 @@ async function openChatById(chatId) {
     }
 }
 
-async function onChatNameChange() {
-    const chatId = chatName.value;
-    await openChatById(chatId);
-}
-
 async function onOnlineStatusChange() {
     const connectionProfilesMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('connection_profiles'));
     if (connectionProfilesMainSelect) {
@@ -560,41 +438,25 @@ async function onOnlineStatusChange() {
     }
 }
 
-function savePanelsState() {
-    localStorage.setItem('topBarPanelsState', JSON.stringify({
-        sidebarVisible: document.getElementById('extensionSideBar')?.classList.contains('visible'),
-    }));
-}
-
-function restorePanelsState() {
-    const state = JSON.parse(localStorage.getItem('topBarPanelsState'));
-
-    if (!state) {
-        return;
-    }
-
-    if (state.sidebarVisible) {
-        document.getElementById('extensionTopBarToggleSidebar')?.click();
-    }
-}
-
 // Init extension on load
 (async function () {
-    addJQueryHighlight();
     patchSheldIfNeeded();
     addTopBar();
     addIcons();
     addSideBar();
     addConnectionProfiles();
     setChatName(getCurrentChatId());
-    chatName.addEventListener('change', onChatNameChange);
+    chatName.addEventListener('click', () => {
+        if (!chatName.classList.contains('not-in-chat')) {
+            onChatManagerClick();
+        }
+    });
     const setChatNameDebounced = debounce(() => setChatName(getCurrentChatId()), debounce_timeout.short);
     for (const eventName of [event_types.CHAT_CHANGED, event_types.CHAT_DELETED, event_types.GROUP_CHAT_DELETED]) {
         eventSource.on(eventName, setChatNameDebounced);
     }
     eventSource.once(event_types.APP_READY, () => {
         bindConnectionProfilesSelect();
-        restorePanelsState();
     });
     eventSource.on(event_types.ONLINE_STATUS_CHANGED, updateStatusDebounced);
 })();

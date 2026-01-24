@@ -7,10 +7,6 @@ body #sheld.flexPatch #chat {
     flex-grow: 1;
 }
 
-#extensionTopBarToggleSidebar.active {
-    filter: brightness(150%);
-}
-
 #extensionConnectionProfiles {
     display: none;
     flex-direction: row;
@@ -23,11 +19,8 @@ body #sheld.flexPatch #chat {
     background-color: var(--SmartThemeBlurTintColor);
     backdrop-filter: blur(var(--SmartThemeBlurStrength));
     height: calc(var(--bottomFormBlockSize) * 0.75);
-    padding: 0 10px;
-    gap: 10px;
-    margin-top: -1px;
+    margin-top: -5px;
     font-size: calc(var(--mainFontSize) * 0.9);
-    border-radius: 0 0 10px 10px;
 }
 
 #extensionSideBar {
@@ -50,9 +43,6 @@ body.reduced-motion #extensionSideBar {
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: 2px;
-    margin-top: 1.5em;
-    gap: 2px;
 }
 
 #extensionSideBar #extensionSideBarLoader {
@@ -69,10 +59,7 @@ body.reduced-motion #extensionSideBar {
     display: flex;
     flex-direction: column;
     transition: filter 0.2s;
-    padding: 5px 10px;
-    border-radius: 10px;
     cursor: pointer;
-    gap: 2px;
     border: 1px solid var(--SmartThemeBorderColor);
 }
 
@@ -103,7 +90,6 @@ body.reduced-motion #extensionSideBar {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 5px;
     font-size: calc(var(--mainFontSize) * 0.8);
 }
 
@@ -118,14 +104,12 @@ body.reduced-motion #extensionSideBar {
     flex-direction: row;
     justify-content: flex-end;
     align-items: baseline;
-    gap: 5px;
 }
 
 #extensionSideBar #extensionSideBarContainer .sideBarItem .chatStats .counterBlock {
     display: flex;
     flex-direction: row;
     align-items: baseline;
-    gap: 5px;
 }
 
 #extensionSideBar #extensionSideBarContainer .sideBarItem .chatStats .counterBlock::after {
@@ -143,11 +127,10 @@ body.reduced-motion #extensionSideBar {
     align-items: baseline;
     width: 100%;
     border: 1px solid var(--SmartThemeBorderColor);
-    border-radius: 10px 10px 0 0;
     background-color: var(--SmartThemeBlurTintColor);
     backdrop-filter: blur(var(--SmartThemeBlurStrength));
     height: var(--bottomFormBlockSize);
-    padding: 0 10px;
+    padding: 0 5px;
     gap: 10px;
     font-size: calc(var(--mainFontSize) * 0.9);
 }
@@ -178,7 +161,6 @@ body.movingUI #extensionTopBar {
     background-size: 8px 5px;
     margin: 0;
     font-size: calc(var(--mainFontSize)* 0.9);
-    padding-right: 20px;
 }
 
 #extensionTopBarChatName {
@@ -195,25 +177,12 @@ body.movingUI #extensionTopBar {
     background-repeat: no-repeat;
     background-position: right 6px center;
     background-size: 8px 5px;
-    padding-right: 20px;
 }
 
-#extensionTopBarSearchInput {
-    background-color: transparent;
-    font-size: calc(var(--mainFontSize) * 0.9);
-    opacity: 0.8;
-    max-width: calc(var(--sheldWidth) * 0.2);
-    flex-grow: 1;
+#extensionOpenaiPresetsSelect:hover, #extensionConnectionProfilesSelect:hover, #extensionTopBarChatName:hover {
+    opacity: 1;
 }
 
-@media screen and (max-width: 1000px) {
-    #extensionTopBarSearchInput {
-        max-width: calc(var(--sheldWidth) * 0.5);
-    }
-}
-
-#extensionTopBarSearchInput:placeholder-shown {
-    font-style: italic;
-    opacity: 0.5;
-    border-color: transparent;
+#extensionTopBarChatName.not-in-chat {
+    cursor: default;
 }

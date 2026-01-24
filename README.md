@@ -1,14 +1,12 @@
 # CT-TopInfoBarFork
 
-A SillyTavern/CozyTavern  extension that provides accessible info and dropdown selectors on the chat top bar. This fork of the original TopInfoBar extension is customized with a streamlined interface featuring quick access to OpenAI presets and connection profiles.
+A SillyTavern/CozyTavern extension that provides accessible info and dropdown selectors on the chat top bar. This fork of the original TopInfoBar extension is customized with a streamlined interface featuring quick access to OpenAI presets and connection profiles.
 
 ## Features
 
 - **Top Info Bar**: A compact bar above the chat area with:
-  - Sidebar toggle button
-  - Chat name selector with dropdown for switching chats
-  - Search functionality to highlight messages in chat
-  - Quick access buttons for chat management (new, rename, delete, close)
+  - Chat name display (click to open View Chat Files dialog)
+  - Quick access buttons for chat management (rename, new, close)
 
 - **Second Row with Dual Dropdown Selectors**:
   - **OpenAI Presets Selector**: Quick switch between Chat Completion presets
@@ -36,12 +34,12 @@ Alternatively, clone this repository directly into your SillyTavern's `public/sc
 
 Once installed, the extension automatically adds a top bar above your chat area:
 
-- **Toggle Sidebar**: Click the archive icon (📦) on the left to show/hide the chat sidebar
-- **Switch Chats**: Use the chat name dropdown to switch between different chats
-- **Search**: Type in the search box to highlight matching text in messages
+- **View Chat Files**: Click on the chat name to open the View Chat Files dialog
+- **Rename Chat**: Click the edit icon to rename the current chat
+- **New Chat**: Click the comments icon to start a new chat
+- **Close Chat**: Click the X icon to close the current chat
 - **OpenAI Presets**: Use the first dropdown on the second row to quickly switch presets
 - **Connection Profiles**: Use the second dropdown to switch connection profiles
-- **Chat Actions**: Use the icons on the right for quick chat management
 
 ## Prerequisites
 
@@ -55,6 +53,25 @@ For support or questions, please open an issue on the GitHub repository.
 Contributions are welcome! Feel free to submit pull requests for bug fixes or new features.
 
 ## Changelog
+
+### v1.1.0
+
+- **Streamlined Top Bar**: Removed toggle sidebar button, search bar, View Chat Files button, and Delete Chat button for a cleaner interface
+- **Reordered Buttons**: Rename Chat button now appears before New Chat button
+- **Simplified Chat Name**: Chat name is now a clickable text that opens the View Chat Files dialog instead of a dropdown select
+- **Code Cleanup**: Removed unused search functionality and related jQuery highlight code
+
+**Technical Changes:**
+
+- Removed `extensionTopBarToggleSidebar` icon
+- Removed `extensionTopBarChatManager` icon (View Chat Files)
+- Removed `extensionTopBarDeleteChat` icon
+- Removed `searchInput` element and search functionality
+- Removed jQuery highlight import and initialization
+- Changed `chatName` from `<select>` to `<div>` element
+- Chat name click now triggers `onChatManagerClick()` to open View Chat Files
+- Removed `savePanelsState()` and `restorePanelsState()` functions
+- Updated CSS to remove search input styles and simplify chat name styles
 
 ### v1.0.0
 
