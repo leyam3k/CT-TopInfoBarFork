@@ -186,3 +186,19 @@ body.movingUI #extensionTopBar {
 #extensionTopBarChatName.not-in-chat {
     cursor: default;
 }
+
+/* Web Search Toggle Button Styles */
+#extensionTopBarGlobalSearch,
+#extensionTopBarApiSearch {
+    transition: color 0.2s, opacity 0.2s;
+}
+
+#extensionTopBarGlobalSearch.active,
+#extensionTopBarApiSearch.active {
+    color: var(--active);
+}
+
+#extensionTopBarApiSearch.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}

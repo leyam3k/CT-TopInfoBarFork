@@ -6,6 +6,7 @@ A SillyTavern/CozyTavern extension that provides accessible info and dropdown se
 
 - **Top Info Bar**: A compact bar above the chat area with:
   - Chat name display (click to open View Chat Files dialog)
+  - Web search toggle buttons (Global Web Search and API-Specific Web Search)
   - Quick access buttons for chat management (rename, new, close)
 
 - **Second Row with Dual Dropdown Selectors**:
@@ -35,6 +36,8 @@ Alternatively, clone this repository directly into your SillyTavern's `public/sc
 Once installed, the extension automatically adds a top bar above your chat area:
 
 - **View Chat Files**: Click on the chat name to open the View Chat Files dialog
+- **Global Web Search**: Click the magnifying glass with plus icon to toggle global web search
+- **API-Specific Web Search**: Click the magnifying glass with location icon to toggle API-specific web search (availability depends on selected API)
 - **Rename Chat**: Click the edit icon to rename the current chat
 - **New Chat**: Click the comments icon to start a new chat
 - **Close Chat**: Click the X icon to close the current chat
@@ -53,6 +56,25 @@ For support or questions, please open an issue on the GitHub repository.
 Contributions are welcome! Feel free to submit pull requests for bug fixes or new features.
 
 ## Changelog
+
+### v1.2.0
+
+- **Web Search Toggle Buttons**: Added two new toggle buttons to the top bar before the Rename Chat button:
+  - **Global Web Search**: Toggle the global web search feature (targets `#websearch_enabled`)
+  - **API-Specific Web Search**: Toggle API-specific web search (targets `#openai_enable_web_search`), automatically disabled when not available for the selected API
+- **Visual Feedback**: Toggle buttons show active state with highlight color when enabled
+- **Smart Availability**: API-specific web search button is automatically disabled and dimmed when the feature is not available for the current API
+
+**Technical Changes:**
+
+- Added `extensionTopBarGlobalSearch` icon with `fa-magnifying-glass-plus` icon
+- Added `extensionTopBarApiSearch` icon with `fa-magnifying-glass-location` icon
+- Added `onGlobalSearchClick()` and `onApiSearchClick()` click handlers
+- Added `updateWebSearchIconsState()` function to sync button states with checkboxes
+- Added `updateWebSearchIconsStateDebounced` for debounced state updates
+- Added `bindWebSearchToggles()` function to bind change listeners and MutationObserver
+- Added CSS styles for `.active` and `.disabled` states on web search buttons
+- Icons update state when presets or connection profiles change
 
 ### v1.1.0
 

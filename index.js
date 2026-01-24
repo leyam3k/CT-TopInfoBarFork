@@ -26,6 +26,26 @@ const openaiPresetsSelect = document.createElement('select');
 
 const icons = [
     {
+        id: 'extensionTopBarGlobalSearch',
+        icon: 'fa-fw fa-solid fa-magnifying-glass-plus',
+        position: 'right',
+        title: t`Toggle Global Web Search`,
+        isToggle: true,
+        target: '#websearch_enabled',
+        isTemporaryAllowed: true,
+        onClick: onGlobalSearchClick,
+    },
+    {
+        id: 'extensionTopBarApiSearch',
+        icon: 'fa-fw fa-solid fa-magnifying-glass-location',
+        position: 'right',
+        title: t`Toggle API-Specific Web Search`,
+        isToggle: true,
+        target: '#openai_enable_web_search',
+        isTemporaryAllowed: true,
+        onClick: onApiSearchClick,
+    },
+    {
         id: 'extensionTopBarRenameChat',
         icon: 'fa-fw fa-solid fa-edit',
         position: 'right',
@@ -77,6 +97,53 @@ async function onRenameChatClick() {
 
     await renameChat(currentChatName, String(newChatName));
 }
+
+function onGlobalSearchClick() {
+    const globalSearchToggle = /** @type {HTMLInputElement} */ (document.getElementById('websearch_enabled'));
+    if (globalSearchToggle) {
+        globalSearchToggle.click();
+        updateWebSearchIconsState();
+    }
+}
+
+function onApiSearchClick() {
+    const apiSearchIcon = document.getElementById('extensionTopBarApiSearch');
+    if (apiSearchIcon?.classList.contains('disabled')) {
+        return;
+    }
+    const apiSearchToggle = /** @type {HTMLInputElement} */ (document.getElementById('openai_enable_web_search'));
+    if (apiSearchToggle) {
+        apiSearchToggle.click();
+        updateWebSearchIconsState();
+    }
+}
+
+function updateWebSearchIconsState() {
+    // Global Search Icon
+    const globalSearchToggle = /** @type {HTMLInputElement} */ (document.getElementById('websearch_enabled'));
+    const globalSearchIcon = document.getElementById('extensionTopBarGlobalSearch');
+    if (globalSearchToggle && globalSearchIcon) {
+        globalSearchIcon.classList.toggle('active', globalSearchToggle.checked);
+    }
+
+    // API-Specific Search Icon
+    const apiSearchToggle = /** @type {HTMLInputElement} */ (document.getElementById('openai_enable_web_search'));
+    const apiSearchIcon = document.getElementById('extensionTopBarApiSearch');
+    if (apiSearchToggle && apiSearchIcon) {
+        const apiSearchContainer = apiSearchToggle.closest('.range-block[data-source]');
+        const isAvailable = apiSearchContainer && getComputedStyle(apiSearchContainer).display !== 'none';
+
+        apiSearchIcon.classList.toggle('disabled', !isAvailable);
+
+        if (isAvailable) {
+            apiSearchIcon.classList.toggle('active', apiSearchToggle.checked);
+        } else {
+            apiSearchIcon.classList.remove('active');
+        }
+    }
+}
+
+const updateWebSearchIconsStateDebounced = debounce(updateWebSearchIconsState, 150);
 
 function patchSheldIfNeeded() {
     // Fun fact: sheld is a typo. It should be shell.
@@ -227,9 +294,11 @@ function bindConnectionProfilesSelect() {
         connectionProfilesSelect.addEventListener('change', async () => {
             connectionProfilesMainSelect.value = connectionProfilesSelect.value;
             connectionProfilesMainSelect.dispatchEvent(new Event('change'));
+            updateWebSearchIconsStateDebounced();
         });
         connectionProfilesMainSelect.addEventListener('change', async () => {
             connectionProfilesSelect.value = connectionProfilesMainSelect.value;
+            updateWebSearchIconsStateDebounced();
         });
         const observer = new MutationObserver(() => {
             connectionProfilesSelect.innerHTML = connectionProfilesMainSelect.innerHTML;
@@ -251,9 +320,11 @@ function bindConnectionProfilesSelect() {
         openaiPresetsSelect.addEventListener('change', async () => {
             openaiPresetsMainSelect.value = openaiPresetsSelect.value;
             openaiPresetsMainSelect.dispatchEvent(new Event('change'));
+            updateWebSearchIconsStateDebounced();
         });
         openaiPresetsMainSelect.addEventListener('change', async () => {
             openaiPresetsSelect.value = openaiPresetsMainSelect.value;
+            updateWebSearchIconsStateDebounced();
         });
         const observer = new MutationObserver(() => {
             openaiPresetsSelect.innerHTML = openaiPresetsMainSelect.innerHTML;
@@ -261,6 +332,33 @@ function bindConnectionProfilesSelect() {
         });
         observer.observe(openaiPresetsMainSelect, { childList: true });
     });
+}
+
+async function bindWebSearchToggles() {
+    await waitUntilCondition(() =>
+        document.getElementById('websearch_enabled') &&
+        document.getElementById('openai_enable_web_search'),
+    );
+
+    const toggles = [
+        { el: /** @type {HTMLInputElement} */ (document.getElementById('websearch_enabled')) },
+        { el: /** @type {HTMLInputElement} */ (document.getElementById('openai_enable_web_search')) },
+    ];
+
+    toggles.forEach(toggle => {
+        if (toggle.el) {
+            toggle.el.addEventListener('change', updateWebSearchIconsState);
+        }
+    });
+
+    // Watch for API search container visibility changes
+    const apiSearchContainer = document.getElementById('openai_enable_web_search')?.closest('.range-block[data-source]');
+    if (apiSearchContainer) {
+        const observer = new MutationObserver(updateWebSearchIconsState);
+        observer.observe(apiSearchContainer, { attributes: true, attributeFilter: ['style'] });
+    }
+
+    updateWebSearchIconsState();
 }
 
 async function closeSidebar() {
@@ -457,6 +555,7 @@ async function onOnlineStatusChange() {
     }
     eventSource.once(event_types.APP_READY, () => {
         bindConnectionProfilesSelect();
+        bindWebSearchToggles();
     });
     eventSource.on(event_types.ONLINE_STATUS_CHANGED, updateStatusDebounced);
 })();
