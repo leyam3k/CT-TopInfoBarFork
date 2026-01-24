@@ -46,6 +46,14 @@ const icons = [
         onClick: onApiSearchClick,
     },
     {
+        id: 'extensionTopBarBackToParent',
+        icon: 'fa-fw fa-solid fa-left-long',
+        position: 'right',
+        title: t`Back to parent chat`,
+        isTemporaryAllowed: true,
+        onClick: onBackToParentClick,
+    },
+    {
         id: 'extensionTopBarRenameChat',
         icon: 'fa-fw fa-solid fa-edit',
         position: 'right',
@@ -117,6 +125,42 @@ function onApiSearchClick() {
         updateWebSearchIconsState();
     }
 }
+
+function onBackToParentClick() {
+    const backToParentIcon = document.getElementById('extensionTopBarBackToParent');
+    if (backToParentIcon?.classList.contains('disabled')) {
+        return;
+    }
+    // Trigger the native back to main button from SillyTavern
+    document.getElementById('option_back_to_main')?.click();
+}
+
+/**
+ * Updates the state of the Back to Parent Chat button based on whether the current chat has a parent.
+ */
+function updateBackToParentState() {
+    const backToParentIcon = document.getElementById('extensionTopBarBackToParent');
+    if (!backToParentIcon) {
+        return;
+    }
+
+    const context = SillyTavern.getContext();
+    const chatMetadata = context.chatMetadata;
+
+    // Check if we're in a checkpoint/fork chat (has a main_chat in metadata)
+    const hasParentChat = chatMetadata && chatMetadata['main_chat'];
+
+    backToParentIcon.classList.toggle('disabled', !hasParentChat);
+
+    // Update title to indicate why it's disabled
+    if (hasParentChat) {
+        backToParentIcon.title = t`Back to parent chat` + `: ${chatMetadata['main_chat']}`;
+    } else {
+        backToParentIcon.title = t`Back to parent chat` + ` (${t`not in a branch/checkpoint chat`})`;
+    }
+}
+
+const updateBackToParentStateDebounced = debounce(updateBackToParentState, 150);
 
 function updateWebSearchIconsState() {
     // Global Search Icon
@@ -552,10 +596,12 @@ async function onOnlineStatusChange() {
     const setChatNameDebounced = debounce(() => setChatName(getCurrentChatId()), debounce_timeout.short);
     for (const eventName of [event_types.CHAT_CHANGED, event_types.CHAT_DELETED, event_types.GROUP_CHAT_DELETED]) {
         eventSource.on(eventName, setChatNameDebounced);
+        eventSource.on(eventName, updateBackToParentStateDebounced);
     }
     eventSource.once(event_types.APP_READY, () => {
         bindConnectionProfilesSelect();
         bindWebSearchToggles();
+        updateBackToParentState();
     });
     eventSource.on(event_types.ONLINE_STATUS_CHANGED, updateStatusDebounced);
 })();

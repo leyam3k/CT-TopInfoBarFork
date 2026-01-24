@@ -7,6 +7,7 @@ A SillyTavern/CozyTavern extension that provides accessible info and dropdown se
 - **Top Info Bar**: A compact bar above the chat area with:
   - Chat name display (click to open View Chat Files dialog)
   - Web search toggle buttons (Global Web Search and API-Specific Web Search)
+  - Back to Parent Chat button (for navigating from checkpoint/fork chats back to the main chat)
   - Quick access buttons for chat management (rename, new, close)
 
 - **Second Row with Dual Dropdown Selectors**:
@@ -38,6 +39,7 @@ Once installed, the extension automatically adds a top bar above your chat area:
 - **View Chat Files**: Click on the chat name to open the View Chat Files dialog
 - **Global Web Search**: Click the magnifying glass with plus icon to toggle global web search
 - **API-Specific Web Search**: Click the magnifying glass with location icon to toggle API-specific web search (availability depends on selected API)
+- **Back to Parent Chat**: Click the left arrow icon to return to the parent chat (only active when in a checkpoint/fork chat, dimmed otherwise)
 - **Rename Chat**: Click the edit icon to rename the current chat
 - **New Chat**: Click the comments icon to start a new chat
 - **Close Chat**: Click the X icon to close the current chat
@@ -56,6 +58,23 @@ For support or questions, please open an issue on the GitHub repository.
 Contributions are welcome! Feel free to submit pull requests for bug fixes or new features.
 
 ## Changelog
+
+### v1.3.0
+
+- **Back to Parent Chat Button**: Added a new button to the top bar before the Rename Chat button:
+  - **Back to Parent Chat**: Navigate from checkpoint/fork chats back to the main/parent chat
+  - Button is automatically dimmed and disabled when not in a checkpoint chat
+  - Hovering shows the parent chat name when available
+- **Visual Feedback**: Button shows disabled state (dimmed, cursor: not-allowed) when current chat has no parent
+
+**Technical Changes:**
+
+- Added `extensionTopBarBackToParent` icon with `fa-left-long` icon
+- Added `onBackToParentClick()` click handler that triggers `#option_back_to_main`
+- Added `updateBackToParentState()` function to check `chatMetadata['main_chat']` for parent chat detection
+- Added `updateBackToParentStateDebounced` for debounced state updates on chat changes
+- Added CSS styles for `.disabled` state on back to parent button
+- Button state updates on `CHAT_CHANGED`, `CHAT_DELETED`, and `GROUP_CHAT_DELETED` events
 
 ### v1.2.0
 

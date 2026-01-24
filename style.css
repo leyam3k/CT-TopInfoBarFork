@@ -202,3 +202,13 @@ body.movingUI #extensionTopBar {
     opacity: 0.3;
     cursor: not-allowed;
 }
+
+/* Back to Parent Chat Button Styles */
+#extensionTopBarBackToParent {
+    transition: color 0.2s, opacity 0.2s;
+}
+
+#extensionTopBarBackToParent.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
