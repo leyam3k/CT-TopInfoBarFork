@@ -58,17 +58,21 @@ body.reduced-motion #extensionSideBar {
 #extensionSideBar #extensionSideBarContainer .sideBarItem {
     display: flex;
     flex-direction: column;
-    transition: filter 0.2s;
+    transition: filter 0.2s, border-color 0.2s, box-shadow 0.2s;
     cursor: pointer;
-    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
+    border: 1px solid rgba(176, 160, 232, 0.6);
 }
 
 #extensionSideBar #extensionSideBarContainer .sideBarItem.selected {
     background-color: var(--cobalt30a);
+    border-color: rgba(176, 160, 232, 0.6);
+    box-shadow: 0 0 8px rgba(176, 160, 232, 0.6);
 }
 
 #extensionSideBar #extensionSideBarContainer .sideBarItem:hover {
-    background-color: var(--white30a);
+    background-color: rgba(176, 160, 232, 0.15);
+    border-color: rgba(176, 160, 232, 0.5);
+    box-shadow: 0 0 6px rgba(176, 160, 232, 0.2);
 }
 
 #extensionSideBar #extensionSideBarContainer .sideBarItem .chatNameContainer {
@@ -126,7 +130,7 @@ body.reduced-motion #extensionSideBar {
     align-content: center;
     align-items: baseline;
     width: 100%;
-    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
+    border: 1px solid rgba(176, 160, 232, 0.6);
     background-color: var(--SmartThemeBlurTintColor);
     backdrop-filter: blur(var(--SmartThemeBlurStrength));
     height: var(--bottomFormBlockSize);
@@ -152,12 +156,12 @@ body.movingUI #extensionTopBar {
     min-width: 0;
     opacity: 0.8;
     background: none;
-    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
+    border: 1px solid rgba(176, 160, 232, 0.6);
     border-radius: 4px;
     margin: 0;
     padding: 2px 4px;
     font-size: calc(var(--mainFontSize)* 0.9);
-    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s;
+    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 
 #extensionOpenaiPresetsSelect,
@@ -170,12 +174,12 @@ body.movingUI #extensionTopBar {
     min-width: 0;
     opacity: 0.8;
     background: none;
-    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
+    border: 1px solid rgba(176, 160, 232, 0.6);
     border-radius: 4px;
     margin: 0;
     padding: 2px 4px;
     font-size: calc(var(--mainFontSize)* 0.9);
-    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s;
+    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 
 #extensionRegexPresetsSelect {
@@ -187,12 +191,12 @@ body.movingUI #extensionTopBar {
     min-width: 0;
     opacity: 0.8;
     background: none;
-    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
+    border: 1px solid rgba(176, 160, 232, 0.6);
     border-radius: 4px;
     margin: 0;
     padding: 2px 4px;
     font-size: calc(var(--mainFontSize)* 0.9);
-    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s;
+    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 
 #extensionTopBarChatName {
@@ -204,10 +208,10 @@ body.movingUI #extensionTopBar {
     width: 100%;
     opacity: 0.8;
     background: none;
-    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
+    border: 1px solid rgba(176, 160, 232, 0.6);
     border-radius: 4px;
     padding: 2px 4px;
-    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s;
+    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 
 #extensionConnectionProfilesSelect:hover,
@@ -216,7 +220,9 @@ body.movingUI #extensionTopBar {
 #extensionRegexPresetsSelect:hover,
 #extensionTopBarChatName:hover {
     opacity: 1;
-    background-color: rgba(158, 127, 208, 0.9);
+    background-color: rgba(176, 160, 232, 0.25);
+    border-color: rgba(176, 160, 232, 0.6);
+    box-shadow: 0 0 8px rgba(176, 160, 232, 0.6);
 }
 
 #extensionTopBarChatName.not-in-chat {
@@ -242,7 +248,7 @@ body.movingUI #extensionTopBar {
 /* Icon Button Styles */
 #extensionTopBar .right_menu_button {
     /* Box styling */
-    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2)) !important;
+    border: 1px solid rgba(176, 160, 232, 0.6) !important;
     border-radius: 4px !important;
     
     /* Add smaller padding to create space between icon and border */
@@ -253,17 +259,19 @@ body.movingUI #extensionTopBar {
     align-items: center !important;
     justify-content: center !important;
     
-    /* Visual enhancements */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    /* Visual enhancements with neon glow */
+    box-shadow: 0 0 4px rgba(176, 160, 232, 0.2) !important;
     transition: all 0.2s ease !important;
     opacity: 0.85 !important;
 }
 
 #extensionTopBar .right_menu_button:hover {
     opacity: 1 !important;
-    border-color: var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2)) !important;
-    background-color: rgba(158, 127, 208, 0.8) !important;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4) !important;
+    border-color: rgba(176, 160, 232, 0.6) !important;
+    background-color: rgba(176, 160, 232, 0.25) !important;
+    box-shadow:
+        0 0 8px rgba(176, 160, 232, 0.4),
+        0 0 12px rgba(176, 160, 232, 0.2) !important;
 }
 
 /* Ensure icons inside buttons are properly sized */
@@ -290,14 +298,14 @@ body.movingUI #extensionTopBar {
 
 #extensionTopBarApiSearch.disabled:hover {
     opacity: 0.3 !important;
-    border-color: var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2)) !important;
+    border-color: rgba(176, 160, 232, 0.6) !important;
     background-color: transparent !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 0 4px rgba(176, 160, 232, 0.2) !important;
 }
 
 /* Back to Parent Chat Button Styles */
 #extensionTopBarBackToParent {
-    transition: color 0.2s, opacity 0.2s, border-color 0.2s, background-color 0.2s;
+    transition: color 0.2s, opacity 0.2s, border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 
 #extensionTopBarBackToParent.disabled {
@@ -307,9 +315,9 @@ body.movingUI #extensionTopBar {
 
 #extensionTopBarBackToParent.disabled:hover {
     opacity: 0.3 !important;
-    border-color: var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2)) !important;
+    border-color: rgba(176, 160, 232, 0.6) !important;
     background-color: transparent !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 0 4px rgba(176, 160, 232, 0.2) !important;
 }
 
 @media (max-width: 768px) {

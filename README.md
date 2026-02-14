@@ -66,16 +66,22 @@ Contributions are welcome! Feel free to submit pull requests for bug fixes or ne
 
 ### v1.4.1
 
-- **Refined Border Styling**: Updated border colors across all UI elements for a more subtle and cohesive appearance:
-  - Changed border color from `var(--SmartThemeBorderColor)` to `var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2))` for reduced opacity
-  - Applied consistent border styling to sidebar items, top bar, dropdown selectors, and icon buttons
-  - Icon buttons now feature proper padding (4px) to prevent icons from touching borders
-  - Disabled buttons no longer show hover highlights for better UX
+- **Neon Purple-Blue Theme Integration**: Completely redesigned border and glow styling to match the main UI's neon aesthetic:
+  - Changed all border colors to neon purple-blue (`rgba(176, 160, 232, 0.6)`) for high visibility
+  - Applied consistent neon theme across sidebar items, top bar, dropdown selectors, and icon buttons
+  - Hover states feature enhanced neon glow effects with layered box-shadows
+  - Hover backgrounds use `rgba(176, 160, 232, 0.25)` for subtle purple tint
+  - Border hover states increase to `rgba(176, 160, 232, 0.6)` with glowing effect
 - **Enhanced Icon Button Design**:
-  - Added box borders with rounded corners (4px border-radius) to all icon buttons
-  - Implemented subtle box shadow (0 2px 6px rgba(0, 0, 0, 0.3)) for depth
-  - Hover state includes enhanced shadow (0 3px 8px rgba(0, 0, 0, 0.4)) and purple highlight
+  - Added neon-styled box borders with rounded corners (4px border-radius)
+  - Implemented neon glow shadow (`0 0 4px rgba(176, 160, 232, 0.2)`) for ambient lighting
+  - Hover state includes multi-layered neon glow (`0 0 8px` and `0 0 12px`) for depth
+  - Icon buttons feature 4px padding to prevent icons from touching borders
   - Proper flexbox centering for icon alignment
+- **Improved Visual Feedback**:
+  - Disabled buttons maintain neon border color but no longer show hover highlights
+  - Selected sidebar items feature enhanced neon glow (`0 0 8px rgba(176, 160, 232, 0.3)`)
+  - All transitions include box-shadow for smooth glow animations
 
 ### v1.4.0
 
