@@ -23,6 +23,8 @@ const chatName = document.createElement('div');
 const connectionProfiles = document.createElement('div');
 const connectionProfilesSelect = document.createElement('select');
 const openaiPresetsSelect = document.createElement('select');
+const worldInfoPresetsSelect = document.createElement('select');
+const regexPresetsSelect = document.createElement('select');
 
 const icons = [
     {
@@ -248,6 +250,23 @@ async function getChatFiles() {
 
 const updateStatusDebounced = debounce(onOnlineStatusChange, 1000);
 
+/**
+ * Trims "Cozy" prefix from option text for display
+ * @param {HTMLSelectElement} sourceSelect Source select element
+ * @param {HTMLSelectElement} targetSelect Target select element to populate
+ */
+function syncSelectWithTrimmedCozy(sourceSelect, targetSelect) {
+    targetSelect.innerHTML = '';
+    Array.from(sourceSelect.options).forEach(option => {
+        const newOption = document.createElement('option');
+        newOption.value = option.value;
+        newOption.textContent = option.textContent.replace(/^Cozy/i, '');
+        newOption.selected = option.selected;
+        targetSelect.appendChild(newOption);
+    });
+    targetSelect.value = sourceSelect.value;
+}
+
 function addTopBar() {
     chatName.id = 'extensionTopBarChatName';
     chatName.title = t`Click to view chat files`;
@@ -323,9 +342,13 @@ function addConnectionProfiles() {
     connectionProfilesSelect.title = t`Switch connection profile`;
     openaiPresetsSelect.id = 'extensionOpenaiPresetsSelect';
     openaiPresetsSelect.title = t`Switch OpenAI preset`;
+    worldInfoPresetsSelect.id = 'extensionWorldInfoPresetsSelect';
+    worldInfoPresetsSelect.title = t`Switch World Info preset`;
+    regexPresetsSelect.id = 'extensionRegexPresetsSelect';
+    regexPresetsSelect.title = t`Switch Regex preset`;
 
     connectionProfiles.classList.add('visible'); // Make it permanently visible
-    connectionProfiles.append(connectionProfilesSelect, openaiPresetsSelect);
+    connectionProfiles.append(connectionProfilesSelect, openaiPresetsSelect, worldInfoPresetsSelect, regexPresetsSelect);
     sheld.insertBefore(connectionProfiles, chat);
 }
 
@@ -358,8 +381,7 @@ function bindConnectionProfilesSelect() {
             return;
         }
         // Initial sync
-        openaiPresetsSelect.innerHTML = openaiPresetsMainSelect.innerHTML;
-        openaiPresetsSelect.value = openaiPresetsMainSelect.value;
+        syncSelectWithTrimmedCozy(openaiPresetsMainSelect, openaiPresetsSelect);
 
         openaiPresetsSelect.addEventListener('change', async () => {
             openaiPresetsMainSelect.value = openaiPresetsSelect.value;
@@ -367,14 +389,57 @@ function bindConnectionProfilesSelect() {
             updateWebSearchIconsStateDebounced();
         });
         openaiPresetsMainSelect.addEventListener('change', async () => {
-            openaiPresetsSelect.value = openaiPresetsMainSelect.value;
+            syncSelectWithTrimmedCozy(openaiPresetsMainSelect, openaiPresetsSelect);
             updateWebSearchIconsStateDebounced();
         });
         const observer = new MutationObserver(() => {
-            openaiPresetsSelect.innerHTML = openaiPresetsMainSelect.innerHTML;
-            openaiPresetsSelect.value = openaiPresetsMainSelect.value;
+            syncSelectWithTrimmedCozy(openaiPresetsMainSelect, openaiPresetsSelect);
         });
         observer.observe(openaiPresetsMainSelect, { childList: true });
+    });
+
+    // Bind World Info presets select
+    waitUntilCondition(() => document.querySelector('.stwip--preset') !== null).then(() => {
+        const worldInfoPresetsMainSelect = /** @type {HTMLSelectElement} */ (document.querySelector('.stwip--preset'));
+        if (!worldInfoPresetsMainSelect) {
+            return;
+        }
+        // Initial sync
+        syncSelectWithTrimmedCozy(worldInfoPresetsMainSelect, worldInfoPresetsSelect);
+
+        worldInfoPresetsSelect.addEventListener('change', async () => {
+            worldInfoPresetsMainSelect.value = worldInfoPresetsSelect.value;
+            worldInfoPresetsMainSelect.dispatchEvent(new Event('change'));
+        });
+        worldInfoPresetsMainSelect.addEventListener('change', async () => {
+            syncSelectWithTrimmedCozy(worldInfoPresetsMainSelect, worldInfoPresetsSelect);
+        });
+        const observer = new MutationObserver(() => {
+            syncSelectWithTrimmedCozy(worldInfoPresetsMainSelect, worldInfoPresetsSelect);
+        });
+        observer.observe(worldInfoPresetsMainSelect, { childList: true });
+    });
+
+    // Bind Regex presets select
+    waitUntilCondition(() => document.getElementById('regex_presets') !== null).then(() => {
+        const regexPresetsMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('regex_presets'));
+        if (!regexPresetsMainSelect) {
+            return;
+        }
+        // Initial sync
+        syncSelectWithTrimmedCozy(regexPresetsMainSelect, regexPresetsSelect);
+
+        regexPresetsSelect.addEventListener('change', async () => {
+            regexPresetsMainSelect.value = regexPresetsSelect.value;
+            regexPresetsMainSelect.dispatchEvent(new CustomEvent('change', { detail: { fromSlashCommand: false } }));
+        });
+        regexPresetsMainSelect.addEventListener('change', async () => {
+            syncSelectWithTrimmedCozy(regexPresetsMainSelect, regexPresetsSelect);
+        });
+        const observer = new MutationObserver(() => {
+            syncSelectWithTrimmedCozy(regexPresetsMainSelect, regexPresetsSelect);
+        });
+        observer.observe(regexPresetsMainSelect, { childList: true });
     });
 }
 
@@ -573,10 +638,23 @@ async function onOnlineStatusChange() {
 
     const openaiPresetsMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('settings_preset_openai'));
     if (openaiPresetsMainSelect) {
-        openaiPresetsSelect.innerHTML = openaiPresetsMainSelect.innerHTML;
-        openaiPresetsSelect.value = openaiPresetsMainSelect.value;
+        syncSelectWithTrimmedCozy(openaiPresetsMainSelect, openaiPresetsSelect);
     } else {
         openaiPresetsSelect.classList.add('displayNone');
+    }
+
+    const worldInfoPresetsMainSelect = /** @type {HTMLSelectElement} */ (document.querySelector('.stwip--preset'));
+    if (worldInfoPresetsMainSelect) {
+        syncSelectWithTrimmedCozy(worldInfoPresetsMainSelect, worldInfoPresetsSelect);
+    } else {
+        worldInfoPresetsSelect.classList.add('displayNone');
+    }
+
+    const regexPresetsMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('regex_presets'));
+    if (regexPresetsMainSelect) {
+        syncSelectWithTrimmedCozy(regexPresetsMainSelect, regexPresetsSelect);
+    } else {
+        regexPresetsSelect.classList.add('displayNone');
     }
 }
 

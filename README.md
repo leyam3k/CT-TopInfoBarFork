@@ -10,10 +10,13 @@ A SillyTavern/CozyTavern extension that provides accessible info and dropdown se
   - Back to Parent Chat button (for navigating from checkpoint/fork chats back to the main chat)
   - Quick access buttons for chat management (rename, new, close)
 
-- **Second Row with Dual Dropdown Selectors**:
-  - **Connection Profiles Selector**: Fast switching between connection profiles
-  - **OpenAI Presets Selector**: Quick switch between Chat Completion presets
-  - Both selectors are synced with their native SillyTavern counterparts
+- **Second Row with Four Dropdown Selectors**:
+  - **Connection Profiles Selector** (35%): Fast switching between connection profiles
+  - **OpenAI Presets Selector** (27.5%): Quick switch between Chat Completion presets
+  - **World Info Presets Selector** (27.5%): Quick switch between World Info presets
+  - **Regex Presets Selector** (10%): Quick switch between Regex presets
+  - All selectors are synced with their native SillyTavern counterparts
+  - Preset names starting with "Cozy" are automatically trimmed for cleaner display
 
 - **Sidebar Panel**: A draggable panel showing all chats for the current character/group with:
   - Chat name and last message preview
@@ -43,8 +46,10 @@ Once installed, the extension automatically adds a top bar above your chat area:
 - **Rename Chat**: Click the edit icon to rename the current chat
 - **New Chat**: Click the comments icon to start a new chat
 - **Close Chat**: Click the X icon to close the current chat
-- **OpenAI Presets**: Use the first dropdown on the second row to quickly switch presets
-- **Connection Profiles**: Use the second dropdown to switch connection profiles
+- **Connection Profiles**: Use the first dropdown (35% width) on the second row to switch connection profiles
+- **OpenAI Presets**: Use the second dropdown (27.5% width) to quickly switch Chat Completion presets
+- **World Info Presets**: Use the third dropdown (27.5% width) to quickly switch World Info presets
+- **Regex Presets**: Use the fourth dropdown (10% width) to quickly switch Regex presets
 
 ## Prerequisites
 
@@ -58,6 +63,47 @@ For support or questions, please open an issue on the GitHub repository.
 Contributions are welcome! Feel free to submit pull requests for bug fixes or new features.
 
 ## Changelog
+
+### v1.4.1
+
+- **Refined Border Styling**: Updated border colors across all UI elements for a more subtle and cohesive appearance:
+  - Changed border color from `var(--SmartThemeBorderColor)` to `var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2))` for reduced opacity
+  - Applied consistent border styling to sidebar items, top bar, dropdown selectors, and icon buttons
+  - Icon buttons now feature proper padding (4px) to prevent icons from touching borders
+  - Disabled buttons no longer show hover highlights for better UX
+- **Enhanced Icon Button Design**:
+  - Added box borders with rounded corners (4px border-radius) to all icon buttons
+  - Implemented subtle box shadow (0 2px 6px rgba(0, 0, 0, 0.3)) for depth
+  - Hover state includes enhanced shadow (0 3px 8px rgba(0, 0, 0, 0.4)) and purple highlight
+  - Proper flexbox centering for icon alignment
+
+### v1.4.0
+
+- **Four Dropdown Selectors**: Expanded the second row to include four preset selectors with optimized space allocation:
+  - **Connection Profiles** (35%): Maintains prominence as the primary selector
+  - **OpenAI Presets** (27.5%): Chat Completion presets selector
+  - **World Info Presets** (27.5%): Quick access to World Info preset switching
+  - **Regex Presets** (10%): Compact Regex preset selector
+- **"Cozy" Prefix Trimming**: Preset names starting with "Cozy" are automatically trimmed for cleaner display (e.g., "CozyPT_Base" displays as "PT_Base")
+- **Improved Visual Design**:
+  - Removed down arrow SVG icons to save space
+  - Added full box borders (1px solid) with 4px border-radius for all selectors
+  - Borders are always visible for better visual clarity
+  - Added subtle background highlight on hover for improved interactivity
+- **Seamless Integration**: All four selectors are fully synced with their native SillyTavern counterparts
+
+**Technical Changes:**
+
+- Added [`worldInfoPresetsSelect`](index.js:26) and [`regexPresetsSelect`](index.js:27) elements
+- Added [`syncSelectWithTrimmedCozy()`](index.js:258) helper function to trim "Cozy" prefix from option text
+- Updated [`addConnectionProfiles()`](index.js:322) to include all four selectors
+- Updated [`bindConnectionProfilesSelect()`](index.js:338) to bind World Info and Regex preset selectors
+- Updated [`onOnlineStatusChange()`](index.js:637) to sync all four selectors
+- Updated CSS with flex-basis allocation: 35%, 27.5%, 27.5%, 10% for the four selectors
+- Replaced down arrow SVG background images with box borders and border-radius
+- Added hover effects with background color transitions
+- World Info Presets uses `.stwip--preset` selector from CT-WorldInfoPresetsFork extension
+- Regex Presets uses `#regex_presets` selector from the regex extension
 
 ### v1.3.0
 

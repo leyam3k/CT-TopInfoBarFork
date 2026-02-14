@@ -60,7 +60,7 @@ body.reduced-motion #extensionSideBar {
     flex-direction: column;
     transition: filter 0.2s;
     cursor: pointer;
-    border: 1px solid var(--SmartThemeBorderColor);
+    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
 }
 
 #extensionSideBar #extensionSideBarContainer .sideBarItem.selected {
@@ -126,12 +126,12 @@ body.reduced-motion #extensionSideBar {
     align-content: center;
     align-items: baseline;
     width: 100%;
-    border: 1px solid var(--SmartThemeBorderColor);
+    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
     background-color: var(--SmartThemeBlurTintColor);
     backdrop-filter: blur(var(--SmartThemeBlurStrength));
     height: var(--bottomFormBlockSize);
-    padding: 0 5px;
-    gap: 10px;
+    padding: 0;
+    gap: 8px;
     font-size: calc(var(--mainFontSize) * 0.9);
 }
 
@@ -143,24 +143,56 @@ body.movingUI #extensionTopBar {
     padding-right: 30px;
 }
 
-#extensionOpenaiPresetsSelect,
 #extensionConnectionProfilesSelect {
-    flex: 1;
+    flex: 0 0 35%;
     cursor: pointer;
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 50%;
     min-width: 0;
     opacity: 0.8;
     background: none;
-    border: none;
-    background-image: url('/img/down-arrow.svg');
-    background-repeat: no-repeat;
-    background-position: right 6px center;
-    background-size: 8px 5px;
+    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
+    border-radius: 4px;
     margin: 0;
+    padding: 2px 4px;
     font-size: calc(var(--mainFontSize)* 0.9);
+    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s;
+}
+
+#extensionOpenaiPresetsSelect,
+#extensionWorldInfoPresetsSelect {
+    flex: 0 0 25.5%;
+    cursor: pointer;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+    opacity: 0.8;
+    background: none;
+    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
+    border-radius: 4px;
+    margin: 0;
+    padding: 2px 4px;
+    font-size: calc(var(--mainFontSize)* 0.9);
+    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s;
+}
+
+#extensionRegexPresetsSelect {
+    flex: 0 0 14%;
+    cursor: pointer;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+    opacity: 0.8;
+    background: none;
+    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
+    border-radius: 4px;
+    margin: 0;
+    padding: 2px 4px;
+    font-size: calc(var(--mainFontSize)* 0.9);
+    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s;
 }
 
 #extensionTopBarChatName {
@@ -172,15 +204,19 @@ body.movingUI #extensionTopBar {
     width: 100%;
     opacity: 0.8;
     background: none;
-    border: none;
-    background-image: url('/img/down-arrow.svg');
-    background-repeat: no-repeat;
-    background-position: right 6px center;
-    background-size: 8px 5px;
+    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2));
+    border-radius: 4px;
+    padding: 2px 4px;
+    transition: border-color 0.2s, opacity 0.2s, background-color 0.2s;
 }
 
-#extensionOpenaiPresetsSelect:hover, #extensionConnectionProfilesSelect:hover, #extensionTopBarChatName:hover {
+#extensionConnectionProfilesSelect:hover,
+#extensionOpenaiPresetsSelect:hover,
+#extensionWorldInfoPresetsSelect:hover,
+#extensionRegexPresetsSelect:hover,
+#extensionTopBarChatName:hover {
     opacity: 1;
+    background-color: rgba(158, 127, 208, 0.9);
 }
 
 #extensionTopBarChatName.not-in-chat {
@@ -203,12 +239,89 @@ body.movingUI #extensionTopBar {
     cursor: not-allowed;
 }
 
+/* Icon Button Styles */
+#extensionTopBar .right_menu_button {
+    /* Box styling */
+    border: 1px solid var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2)) !important;
+    border-radius: 4px !important;
+    
+    /* Add smaller padding to create space between icon and border */
+    padding: 4px !important;
+    
+    /* Content centering */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    /* Visual enhancements */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.2s ease !important;
+    opacity: 0.85 !important;
+}
+
+#extensionTopBar .right_menu_button:hover {
+    opacity: 1 !important;
+    border-color: var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2)) !important;
+    background-color: rgba(158, 127, 208, 0.8) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Ensure icons inside buttons are properly sized */
+#extensionTopBar .right_menu_button i {
+    font-size: 16px !important;
+    line-height: 1 !important;
+}
+
+/* Web Search Toggle Button Styles */
+#extensionTopBarGlobalSearch,
+#extensionTopBarApiSearch {
+    transition: color 0.2s, opacity 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+#extensionTopBarGlobalSearch.active,
+#extensionTopBarApiSearch.active {
+    color: var(--active);
+}
+
+#extensionTopBarApiSearch.disabled {
+    opacity: 0.3 !important;
+    cursor: not-allowed !important;
+}
+
+#extensionTopBarApiSearch.disabled:hover {
+    opacity: 0.3 !important;
+    border-color: var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2)) !important;
+    background-color: transparent !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
 /* Back to Parent Chat Button Styles */
 #extensionTopBarBackToParent {
-    transition: color 0.2s, opacity 0.2s;
+    transition: color 0.2s, opacity 0.2s, border-color 0.2s, background-color 0.2s;
 }
 
 #extensionTopBarBackToParent.disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+    opacity: 0.3 !important;
+    cursor: not-allowed !important;
+}
+
+#extensionTopBarBackToParent.disabled:hover {
+    opacity: 0.3 !important;
+    border-color: var(--SmartThemeQuoteColor, rgba(255, 255, 255, 0.2)) !important;
+    background-color: transparent !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+@media (max-width: 768px) {
+    #extensionTopBarChatName,
+    #extensionConnectionProfilesSelect,
+    #extensionOpenaiPresetsSelect,
+    #extensionWorldInfoPresetsSelect,
+    #extensionRegexPresetsSelect {
+        font-size: 11px;
+    }
+
+    #extensionTopBar {
+        gap: 4px;
+  }  
 }
